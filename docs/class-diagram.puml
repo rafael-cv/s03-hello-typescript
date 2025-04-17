@@ -1,0 +1,95 @@
+@startuml
+skinparam monochrome true
+
+package "Shared Bounded Context" {
+class Currency {
+-_code: CurrencyCode
++code: string
++formatAmount(amount: number, locale: string): string
++toString(): string
+}
+
+class Money {
+-_amount: number
+-_currency: Currency
++amount: number
++currency: Currency
++toString(): string
++format(locale: string): string
++add(other: Money): Money
++multiply(factor: number): Money
+}
+
+class DateTime {
+-_date: Date
++value: Date
++format(locale: string): string
++toString(): string
+}
+
+note right of Currency
+CurrencyCode is a template literal type:
+3 uppercase letters (e.g., "USD")
+end note
+}
+
+package "CRM Bounded Context" {
+class Customer {
+-_id: string
+-_name: string
+-_lastOrderPrice: Money | null
++id: string
++name: string
++lastOrderPrice: Money | null
+}
+}
+
+package "Sales Bounded Context" {
+class SalesOrder {
+-_customerId: string
+-_id: string
+-_items: SalesOrderItem[]
+-_orderedAt: DateTime
+-_currency: Currency
+-_state: SalesOrderState
++id: string
++customerId: string
++orderedAt: DateTime
++currency: Currency
++state: SalesOrderState
++addItem(productId: string, quantity: number, unitPriceAmount: number): void
++calculateTotalPrice(): Money
++getFormattedOrderedAt(): string
++confirm(): void
++ship(): void
++cancel(): void
+-canAddItems(): boolean
+}
+
+class SalesOrderItem {
+-_orderId: string
+-_itemId: string
+-_productId: string
+-_quantity: number
+-_unitPrice: Money
++productId: string
++quantity: number
++unitPrice: Money
++calculateItemPrice(): Money
+}
+
+note right of SalesOrder
+SalesOrderState is a union type:
+"PENDING" | "CONFIRMED" | "SHIPPED" | "CANCELLED"
+end note
+}
+
+' Relationships
+Customer "1" o--> "0..1" Money : lastOrderPrice
+SalesOrder "1" *--> "*" SalesOrderItem : items
+SalesOrder "1" --> "1" Currency : currency
+SalesOrder "1" --> "1" DateTime : orderedAt
+SalesOrderItem "1" --> "1" Money : unitPrice
+Money "1" --> "1" Currency : currency
+
+@enduml
