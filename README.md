@@ -1,4 +1,4 @@
-# typescript-review
+# s03-hello-typescript
 
 This is a console application illustrating TypeScript-based CRM and Sales concepts with Object-Oriented Programming and Domain-Driven Design (DDD) principles.
 
